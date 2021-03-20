@@ -1,0 +1,10 @@
+.footer-logo-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 0;
+}
+
+.footer-logo {
+    max-width: 300px;
+}

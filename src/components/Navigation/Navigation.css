@@ -1,0 +1,63 @@
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 40px;
+}
+
+.header-logo {
+    max-width: 150px;
+}
+
+.header-logo img {
+    width: 100%;
+}
+
+.signin-btn {
+    border: none;
+    padding: 10px 20px;
+    background: #E50914;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.control-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.nav-btn {
+    padding: 5px;
+    margin-left: 10px;
+    border-radius: 4px;
+}
+
+.nav-btn:nth-child(2) {
+    background: rgba(51, 51, 51, 0.5);
+    padding: 10px 20px;
+    font-size: 18px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.nav-btn:hover {
+    color: black;
+    background: white;
+    transition: all 0.2s;
+}
+
+@media all and (max-width: 900px) {
+    nav {
+        padding: 5px 10px;
+    }
+    .header-logo {
+        max-width: 100px;
+    }
+    .signin-btn {
+        padding: 5px 10px;
+        font-size: 16px;
+    }
+}

@@ -1,23 +1,33 @@
-import logo from './logo.svg';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import './App.css';
+import Navigation from './components/Navigation/Navigation';
+import Footer from './components/Footer/Footer';
+import Homescreen from './components/HomeScreen/HomeScreen';
+import LandingScreen from './components/LandingScreen/LandingScreen';
+import SignScreen from './components/SignScreen/SignScreen';
+import Search from './components/Search/Search';
+import Genres from './components/Genres/Genres';
+import Details from './components/Details/Details';
+import Watch from './components/Watch/Watch';
+
 
 function App() {
+
+  const user = true
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Navigation user={user} />
+      <Switch>
+        <Route exact path="/" render={() => (!user ? <LandingScreen /> : <Homescreen />)} />
+        <Route path="/sign-in" render={() => (!user ? <SignScreen /> : <Redirect to="/" />)} />
+        <Route path="/sign-up" render={() => (!user ? <SignScreen /> : <Redirect to="/" />)} />
+        <Route path="/search" render={() => (!user ? <Redirect to="/sign-in" /> : <Search />)} />
+        <Route path="/movies/:genre" render={() => (!user ? <Redirect to="/sign-in" /> : <Genres />)} />
+        <Route path="/details/:id" render={() => (!user ? <Redirect to="/sign-in" /> : <Details />)} />
+        <Route path="/watch/:id" render={() => (!user ? <Redirect to="/sign-in" /> : <Watch />)} />
+      </Switch>
+      <Footer />
     </div>
   );
 }

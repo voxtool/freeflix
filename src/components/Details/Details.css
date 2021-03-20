@@ -1,0 +1,42 @@
+.red {
+    background-color: #E50914;
+}
+
+.movie-stats {
+    font-size: 18px;
+    padding: 0 10px;
+    border-right: 1px solid white;
+}
+
+.movie-stats:first-of-type {
+    padding: 0 10px 0 0;
+}
+
+.movie-stats:last-of-type {
+    border: none;
+}
+
+.trailer-wrapper {
+    margin: 50px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.trailer {
+    flex-basis: 35%;
+    width: 100%;
+    border: none;
+    margin-right: 5%;
+}
+
+.watch-links {
+    display: flex;
+    flex-direction: column;
+}
+
+@media all and (max-width: 900px) {
+    .trailer-wrapper {
+        flex-direction: column;
+    }
+}

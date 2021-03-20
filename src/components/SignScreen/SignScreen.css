@@ -1,0 +1,37 @@
+.user-form-wrapper {
+    padding: 50px;
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.user-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-form-field {
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.user-form-field:focus {
+    outline: none;
+}
+
+.user-form-title {
+    margin-bottom: 10px;
+}
+
+.user-form-description {
+    padding: 0 10px;
+    margin-top: 20px;
+}
+
+.user-form-description {
+    color: gray;
+}
+
+.user-form-link:hover {
+    text-decoration: underline;
+}
