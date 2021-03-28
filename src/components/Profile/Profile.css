@@ -1,0 +1,42 @@
+.user-profile-wrapper {
+    padding: 50px;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.user-profile-info {
+    margin-left: 50px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    font-size: 20px;
+}
+
+.user-profile-email {
+    background: rgba(51, 51, 51, 0.5);
+    padding: 20px;
+    border-radius: 4px;
+}
+
+.user-profile-movies {
+    padding: 20px 0;
+}
+
+.user-profile-signout {
+    padding: 20px 0;
+    text-align: center;
+}
+
+@media all and (max-width: 900px) {
+    .user-profile-wrapper {
+        flex-direction: column;
+        align-items: center;
+    }
+    .user-profile-info {
+        margin-top: 50px;
+        margin-left: 0;
+        text-align: center;
+    }
+}

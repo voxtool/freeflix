@@ -75,15 +75,15 @@ async function logout(req, res) {
 }
 
 
-// async function getProfileInfo(req, res, next) {
-//     const { _id: userId } = req.user;
-//     try {
-//         const user = await User.findOne({ _id: userId }).select(['images', 'followed', 'comments', 'username', 'created_at', 'updatedAt']);
-//         res.status(200).json(user);
-//     } catch (err) {
-//         next(err);
-//     }
-// }
+async function getProfileInfo(req, res, next) {
+    const { _id: userId } = req.user;
+    try {
+        const user = await User.findOne({ _id: userId }).select(['email', 'movies']);
+        res.status(200).json(user);
+    } catch (err) {
+        next(err);
+    }
+}
 
 // async function getAllUsers(req, res, next) {
 //     const { _id: userId } = req.user;
@@ -110,7 +110,7 @@ module.exports = {
     login,
     register,
     logout,
-    // getProfileInfo,
+    getProfileInfo,
     // getAllUsers,
     // getUserById
 }

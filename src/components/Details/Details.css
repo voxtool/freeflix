@@ -39,4 +39,7 @@
     .trailer-wrapper {
         flex-direction: column;
     }
+    .trailer {
+        margin-right: 0;
+    }
 }

@@ -18,7 +18,12 @@ function Details() {
             setLink(movie.videos.results[0]?.key);
             setImageUrl(`${requests.imageBaseUrl}${movie.backdrop_path}`);
             const regex = /(,|'|:|\(|\)|%|\/|\\|\?|!)/gm;
-            const pbay = await fetch(`/api/movies/search/${movie?.title.replace(regex, '') || movie?.name.replace(regex, '') || movie?.original_name.replace(regex, '')} ${movie.release_date?.slice(0, 4)}`);
+            const pbay = await fetch(`/api/movies/search/${movie?.title.replace(regex, '') || movie?.name.replace(regex, '') || movie?.original_name.replace(regex, '')} ${movie.release_date?.slice(0, 4)}`, {
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: 'include'
+            });
             const magnets = await pbay.json();
             if (magnets && magnets[0] !== '0' && magnets[0] !== undefined && magnets[0] !== null) {
                 setMagnet(magnets);

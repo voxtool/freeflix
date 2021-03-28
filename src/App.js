@@ -1,5 +1,7 @@
+import { useContext } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import './App.css';
+import { AuthContext } from './context/AuthContext';
 import Navigation from './components/Navigation/Navigation';
 import Footer from './components/Footer/Footer';
 import Homescreen from './components/HomeScreen/HomeScreen';
@@ -9,26 +11,30 @@ import Search from './components/Search/Search';
 import Genres from './components/Genres/Genres';
 import Details from './components/Details/Details';
 import Watch from './components/Watch/Watch';
+import Profile from './components/Profile/Profile';
 
 
 function App() {
 
-  const user = true
+  const { user, loading } = useContext(AuthContext);
 
   return (
-    <div className="App">
-      <Navigation user={user} />
-      <Switch>
-        <Route exact path="/" render={() => (!user ? <LandingScreen /> : <Homescreen />)} />
-        <Route path="/sign-in" render={() => (!user ? <SignScreen /> : <Redirect to="/" />)} />
-        <Route path="/sign-up" render={() => (!user ? <SignScreen /> : <Redirect to="/" />)} />
-        <Route path="/search" render={() => (!user ? <Redirect to="/sign-in" /> : <Search />)} />
-        <Route path="/movies/:genre" render={() => (!user ? <Redirect to="/sign-in" /> : <Genres />)} />
-        <Route path="/details/:id" render={() => (!user ? <Redirect to="/sign-in" /> : <Details />)} />
-        <Route path="/watch/:id" render={() => (!user ? <Redirect to="/sign-in" /> : <Watch />)} />
-      </Switch>
-      <Footer />
-    </div>
+    !loading
+      ? <div className="App">
+        <Navigation user={user} />
+        <Switch>
+          <Route exact path="/" render={() => (!user ? <LandingScreen /> : <Homescreen />)} />
+          <Route path="/sign-in" render={() => (!user ? <SignScreen /> : <Redirect to="/" />)} />
+          <Route path="/sign-up" render={() => (!user ? <SignScreen /> : <Redirect to="/" />)} />
+          <Route path="/profile" render={() => (!user ? <Redirect to="/sign-in" /> : <Profile />)} />
+          <Route path="/search" render={() => (!user ? <Redirect to="/sign-in" /> : <Search />)} />
+          <Route path="/movies/:genre" render={() => (!user ? <Redirect to="/sign-in" /> : <Genres />)} />
+          <Route path="/details/:id" render={() => (!user ? <Redirect to="/sign-in" /> : <Details />)} />
+          <Route path="/watch/:id" render={() => (!user ? <Redirect to="/sign-in" /> : <Watch />)} />
+        </Switch>
+        <Footer />
+      </div>
+      : null
   );
 }
 
