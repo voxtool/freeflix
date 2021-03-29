@@ -13,13 +13,12 @@ function Banner(props) {
         try {
             const request = await fetch(url);
             const movies = await request.json();
-            const movie = movies.results[Math.floor(Math.random() * movies.results.length - 1)];
+            const movie = movies.results[Math.ceil(Math.random() * movies.results.length - 1)];
             setMovie(movie);
             setImageUrl(`${requests.imageBaseUrl}${movie.backdrop_path}`);
             return movie;
         } catch (error) {
             setError(error);
-            console.log(error);
         }
     }
 

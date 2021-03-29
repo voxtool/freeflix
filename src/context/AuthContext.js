@@ -17,11 +17,12 @@ function AuthContextProvider(props) {
                     method: "GET",
                     credentials: 'include'
                 });
-                setLoading(false);
                 const userData = await response.json();
-                return userData.message ? setUser(null) : setUser(userData)
+                userData.message ? setUser(null) : setUser(userData)
             } catch (error) {
                 console.log(error);
+            } finally {
+                setLoading(false);
             }
         }
         if (!user) {
