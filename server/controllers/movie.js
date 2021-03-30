@@ -58,13 +58,11 @@ async function playMovie(req, res, next) {
     });
 
     req.on('close', function () {
-        engine.destroy(() => console.log('closed and destoyed'));
-        engine.remove(() => console.log('closed and removed'));
+        engine.remove(() => engine.destroy(() => console.log('closed removed and destoyed')));
     });
 
     req.on('end', function () {
-        engine.destroy(() => console.log('ended and destoyed'));
-        engine.remove(() => console.log('ended and removed'));
+        engine.remove(() => engine.destroy(() => console.log('ended removed and destoyed')));
     });
 }
 

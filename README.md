@@ -26,6 +26,6 @@ This command will automatically build the app and open a window on your browser.
 
 ### Note! If you change the port from example.env you need to manually open the app in the port you set. The `serve` command is hardcoded to open a new tab on port 3000!
 
-#### Note! Some movies may be silent. That is not the application's fault. Chrome and others browsers don't support all audio codecs.
+#### Note! Some movies may be silent. That is not the applications fault. Chrome and other browsers don't support all audio codecs.
 
 #### If the app crashes for some reason just restart it. If you are a develpover you can open an issue and give informtion how to reproduce the crash/bug
