@@ -1,3 +1,7 @@
+button {
+    outline: none;
+}
+
 .red {
     background-color: #E50914;
 }

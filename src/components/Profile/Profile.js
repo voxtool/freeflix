@@ -7,9 +7,9 @@ function Profile() {
 
     const { user, setUser } = useContext(AuthContext);
 
-    async function userHandler(data, endpoint) {
+    async function logoutHandler() {
         try {
-            const response = await fetch(`/api/users/${endpoint.toLowerCase()}`, {
+            const response = await fetch('/api/users/logout', {
                 headers: {
                     "Content-Type": "application/json"
                 },
@@ -18,14 +18,11 @@ function Profile() {
                 body: null
             })
             const userData = await response.json();
-            return setUser(null)
+            setUser(null);
+            return userData
         } catch (error) {
             console.log(error);
         }
-    }
-
-    function logoutHandler() {
-        userHandler({}, 'logout')
     }
 
     return (
@@ -37,7 +34,10 @@ function Profile() {
                         <p>{user.email}</p>
                     </div>
                     <div className="user-profile-movies">
-                        <p>Currently you have {user.movies.length} movies in your watchlist.</p>
+                        <p>Your subscription: <strong>Freemium</strong></p>
+                    </div>
+                    <div className="user-profile-movies">
+                        <p>Currently you have {user.movies.length} {user.movies.length !== 1 ? 'movies' : 'movie'} in your watchlist.</p>
                     </div>
                     <div className="user-profile-signout">
                         <button className="signin-btn" onClick={logoutHandler}>Sign Out</button>

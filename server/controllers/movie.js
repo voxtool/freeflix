@@ -1,3 +1,5 @@
+const { Movie } = require('../models');
+const { User } = require('../models');
 const path = require('path');
 const torrentStream = require('torrent-stream');
 const TorrentSearchApi = require('torrent-search-api');
@@ -24,7 +26,7 @@ async function searchMovies(req, res, next) {
 
 async function playMovie(req, res, next) {
     const id = req.params.id;
-    const engine = torrentStream(magnets[id]);
+    const engine = torrentStream(magnets[id], {tmp: path.join(__dirname, '../../')});
 
     engine.on('ready', function () {
         file = engine.files.find(f => path.extname(f.name).includes('.mp4') ||
@@ -66,8 +68,49 @@ async function playMovie(req, res, next) {
     });
 }
 
+async function addMovie(req, res, next) {
+    const { imageUrl, title, externalId } = req.body;
+    const { _id: userId } = req.user;
+
+    try {
+        const movie = await Movie.create({ imageUrl, title, externalId, userId });
+        const user = await User.findByIdAndUpdate({ _id: userId }, { $addToSet: { movies: movie._id } }, { new: true }).select(['email', 'movies']).populate('movies');
+        res.status(200).json(user);
+    } catch (err) {
+        next(err);
+    }
+}
+
+async function deleteMovie(req, res, next) {
+    const { movieId } = req.params;
+    const { _id: userId } = req.user;
+
+    try {
+        const deleted = await Movie.findOneAndDelete({ _id: movieId });
+        const user = await User.findByIdAndUpdate({ _id: userId }, { $pull: { movies: movieId } }, { new: true }).select(['email', 'movies']).populate('movies');
+        res.status(200).json(user);
+    } catch (err) {
+        next(err);
+    }
+}
+
+async function getMovies(req, res, next) {
+    const { pageSize, page } = req.params;
+    const user = req.user;
+    try {
+        const movies = await Movie.find({ _id: { $in: user.movies } }).sort({ created_at: -1 }).limit(Number(pageSize)).skip((Number(page) - 1) * Number(pageSize));
+        const total = await Movie.countDocuments({ _id: { $in: user.movies } });
+        const pages = Math.ceil(total / Number(pageSize));
+        res.json({pages, movies});
+    } catch (err) {
+        next(err);
+    }
+}
 
 module.exports = {
     playMovie,
-    searchMovies
+    searchMovies,
+    addMovie,
+    deleteMovie,
+    getMovies
 }

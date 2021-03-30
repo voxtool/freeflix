@@ -7,7 +7,7 @@ const utils = require('../utils');
 async function register(req, res, next) {
     const { email, password } = req.body;
     try {
-        let user = await User.findOne({ email });
+        let user = await User.findOne({ email }).populate('movies');
         if (user) {
             res.status(409)
                 .send({ message: 'The email is already registered!' });
@@ -39,7 +39,7 @@ async function register(req, res, next) {
 async function login(req, res, next) {
     const { email, password } = req.body;
     try {
-        let user = await User.findOne({ email });
+        let user = await User.findOne({ email }).populate('movies');
         if (!user) {
             res.status(401)
                 .send({ message: 'Wrong email or password' });
@@ -78,39 +78,17 @@ async function logout(req, res) {
 async function getProfileInfo(req, res, next) {
     const { _id: userId } = req.user;
     try {
-        const user = await User.findOne({ _id: userId }).select(['email', 'movies']);
+        const user = await User.findOne({ _id: userId }).select(['email', 'movies']).populate('movies');
         res.status(200).json(user);
     } catch (err) {
         next(err);
     }
 }
 
-// async function getAllUsers(req, res, next) {
-//     const { _id: userId } = req.user;
-//     try {
-//         const users = await User.find({ _id: { $nin: [userId] } }).sort({ created_at: -1 }).select(['_id', 'username']);
-//         res.status(200).json(users);
-//     } catch (err) {
-//         next(err);
-//     }
-// }
-
-// async function getUserById(req, res, next) {
-//     const { userId } = req.params;
-//     try {
-//         const user = await User.findById(userId).select(['images', 'followed', 'comments', 'username', 'created_at', 'updatedAt']).populate('images');
-//         res.json(user);
-//     } catch (err) {
-//         next(err);
-//     }
-// }
-
 
 module.exports = {
     login,
     register,
     logout,
-    getProfileInfo,
-    // getAllUsers,
-    // getUserById
+    getProfileInfo
 }
