@@ -20,6 +20,7 @@ const api = require('./server/router');
         app.use(express.json());
         app.use(cookieParser(config.cookieSecret));
         app.use(express.static(path.join(__dirname, '/build')));
+        app.use('/static', express.static(path.join(__dirname, 'src/subtitles')));
         app.use(cors());
         app.use('/api', api);
 

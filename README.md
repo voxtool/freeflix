@@ -1,10 +1,10 @@
 # Freeflix
 
-Freeflix is a free movie streaming application. Powered by TMDB API.
+Freeflix is a free movie streaming application with responsive design and subtitle support. Powered by TMDB API.
 
 ## What this app doesn't do?
 
-The app doesn't support series and subtitles at the moment.
+The app doesn't support series at the moment.
 
 ## How to run
 
