@@ -17,9 +17,7 @@ function Watch() {
                 });
                 const path = await response.json();
                 setSubEn(path ? "/static/" + path : undefined);
-            } catch (error) {
-                console.log(error);
-            }
+            } catch (error) {}
         }
         getSubtitles()
     }, [subEn]);

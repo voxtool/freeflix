@@ -92,7 +92,7 @@ async function getSubtitles(req, res, next) {
     const movieId = imdbId.find(el => el !== '');
     await OpenSubtitles.search({
         sublanguageid: "eng",
-        extensions: ["srt", "vtt"],
+        extensions: "srt",
         imdbid: movieId
     }).then(async subtitles => {
         let subPath = subtitleDir;
