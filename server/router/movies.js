@@ -5,6 +5,8 @@ const { movieController } = require('../controllers');
 
 router.get('/search/:query', auth(), movieController.searchMovies);
 router.get('/play/:id', movieController.playMovie);
+router.get('/clean', movieController.clean);
+router.get('/subclean', movieController.subClean);
 router.get('/subtitles', movieController.getSubtitles);
 router.get('/:pageSize/:page', auth(), movieController.getMovies);
 router.post('/add', auth(), movieController.addMovie);

@@ -17,10 +17,38 @@ function Watch() {
                 });
                 const path = await response.json();
                 setSubEn(path ? "/static/" + path : undefined);
-            } catch (error) {}
+            } catch (error) { }
         }
-        getSubtitles()
+        getSubtitles();
     }, [subEn]);
+
+    useEffect(() => {
+        return async () => {
+            try {
+                const response = await fetch('/api/movies/clean', {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+                const result = await response.json();
+                console.log(result);
+            } catch (error) { }
+        }
+    }, [])
+
+    useEffect(() => {
+        return async () => {
+            try {
+                const response = await fetch('/api/movies/subclean', {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+                const result = await response.json();
+                console.log(result);
+            } catch (error) { }
+        }
+    }, [])
 
     return (
         <div className="video-wrapper">

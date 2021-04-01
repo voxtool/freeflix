@@ -2,16 +2,21 @@ const fs = require("fs");
 const { Movie } = require('../models');
 const { User } = require('../models');
 const path = require('path');
-const torrentStream = require('torrent-stream');
 const TorrentSearchApi = require('torrent-search-api');
 TorrentSearchApi.enableProvider('ThePirateBay');
 const download = require("download");
+const rmdir = require('rimraf');
+const subsrt = require('subsrt');
+const WebTorrent = require('webtorrent');
 const OS = require("opensubtitles-api");
+const client = new WebTorrent();
 const OpenSubtitles = new OS({ useragent: 'UserAgent' });
+const streamDir = path.join(__dirname, '../../stream');
 const subtitleDir = path.join(__dirname, '../../src/subtitles/');
 let magnets = {};
 let ids = [];
 let imdbId = [];
+let torId;
 
 
 async function searchMovies(req, res, next) {
@@ -26,20 +31,6 @@ async function searchMovies(req, res, next) {
             ids.push(el.id);
             imdbId.push(el.imdb);
         });
-        fs.readdir(subtitleDir, (err, files) => {
-            if (err) {
-                console.log(err)
-                throw err
-            }
-            for (const file of files) {
-                fs.unlink(path.join(subtitleDir, file), err => {
-                    if (err) {
-                        console.log(err)
-                        throw err
-                    }
-                });
-            }
-        });
         res.json(ids);
     } catch (error) {
         console.log(error);
@@ -48,20 +39,19 @@ async function searchMovies(req, res, next) {
 
 async function playMovie(req, res, next) {
     const id = req.params.id;
-    const engine = torrentStream(magnets[id], { tmp: path.join(__dirname, '../../') });
-
-    engine.on('ready', function () {
-        file = engine.files.find(f => path.extname(f.name).includes('.mp4') ||
-            path.extname(f.name).includes('.mkv') ||
-            path.extname(f.name).includes('.avi') ||
-            path.extname(f.name).includes('.xvid') ||
-            path.extname(f.name).includes('.divx'));
-
+    if (client.get(magnets[id])) {
+        const file = client.get(magnets[id]).files.find(function (file) {
+            return file.name.endsWith('.mp4') ||
+                file.name.endsWith('.mkv') ||
+                file.name.endsWith('.avi') ||
+                file.name.endsWith('.xvid') ||
+                file.name.endsWith('.divx')
+        });
         if (req.headers.range) {
             const range = req.headers.range;
             const positions = range.replace(/bytes=/, "").split("-");
             const start = parseInt(positions[0], 10);
-            const total = file.length;
+            const total = file?.length;
             const end = positions[1] ? parseInt(positions[1], 10) : total - 1;
             const chunk = (end - start) + 1;
 
@@ -77,42 +67,100 @@ async function playMovie(req, res, next) {
             stream = file.createReadStream();
             stream.pipe(res);
         }
-    });
+    } else {
+        client.add(magnets[id], { path: streamDir }, function (torrent) {
+            torId = magnets[id];
+            const file = torrent.files.find(function (file) {
+                return file.name.endsWith('.mp4') ||
+                    file.name.endsWith('.mkv') ||
+                    file.name.endsWith('.avi') ||
+                    file.name.endsWith('.xvid') ||
+                    file.name.endsWith('.divx')
+            });
+            if (req.headers.range) {
+                const range = req.headers.range;
+                const positions = range.replace(/bytes=/, "").split("-");
+                const start = parseInt(positions[0], 10);
+                const total = file.length;
+                const end = positions[1] ? parseInt(positions[1], 10) : total - 1;
+                const chunk = (end - start) + 1;
 
-    req.on('close', function () {
-        engine.remove(() => engine.destroy(() => console.log('closed removed and destoyed')));
-    });
+                stream = file.createReadStream({ start: start, end: end });
+                stream.pipe(res);
+                res.writeHead(206, {
+                    "Content-Range": "bytes " + start + "-" + end + "/" + total,
+                    "Accept-Ranges": "bytes",
+                    "Content-Length": chunk,
+                    "Content-Type": "video/mp4"
+                });
+            } else {
+                stream = file.createReadStream();
+                stream.pipe(res);
+            }
+        })
+    }
+}
 
-    req.on('end', function () {
-        engine.remove(() => engine.destroy(() => console.log('ended removed and destoyed')));
+async function clean(req, res, next) {
+    if (client.get(torId)) {
+        client.remove(torId, (err) => { })
+    }
+    rmdir(streamDir, function (error) {
+        if (error) {
+            console.log(error)
+        }
     });
+    res.status(200).json('Movies cleaned!')
+}
+
+async function subClean(req, res, next) {
+    fs.readdir(subtitleDir, (err, files) => {
+        if (err) {
+            console.log(err)
+            throw err
+        }
+        for (const file of files) {
+            fs.unlink(path.join(subtitleDir, file), err => {
+                if (err) {
+                    console.log(err)
+                    throw err
+                }
+            });
+        }
+    });
+    res.status(200).json('Subtitles cleaned!');
 }
 
 async function getSubtitles(req, res, next) {
     const movieId = imdbId.find(el => el !== '');
-    await OpenSubtitles.search({
-        sublanguageid: "eng",
-        extensions: "srt",
-        imdbid: movieId
-    }).then(async subtitles => {
-        let subPath = subtitleDir;
-        let subPathEn = undefined;
-        if (subtitles.en && subtitles.en.vtt && !fs.existsSync(subPath + movieId + "_" + "en.vtt")) {
-            await download(subtitles.en.vtt)
-                .then(data => {
-                    fs.writeFileSync(subPath + movieId + "_" + "en.vtt", data);
-                })
-                .catch(err => {
-                    console.log("No english subtitles");
-                });
-            subPathEn = fs.existsSync(subPath + movieId + "_" + "en.vtt")
-                ? movieId + "_" + "en.vtt"
-                : undefined;
-        } else if (fs.existsSync(subPath + movieId + "_" + "en.vtt")) {
-            subPathEn = movieId + "_" + "en.vtt";
-        }
-        return res.status(200).json(subPathEn);
-    });
+    if (movieId) {
+        await OpenSubtitles.search({
+            sublanguageid: "eng",
+            extensions: "srt",
+            imdbid: movieId
+        }).then(async subtitles => {
+            let subPath = subtitleDir;
+            let subPathEn = undefined;
+            if (subtitles.en) {
+                await download(subtitles.en.url)
+                    .then(data => {
+                        fs.writeFileSync(subPath + movieId + "_" + "en.srt", data);
+                    })
+                    .catch(err => {
+                        console.log("No english subtitles");
+                    });
+                const srt = fs.readFileSync(subPath + movieId + "_" + "en.srt", 'utf8');
+                const vtt = subsrt.convert(srt, { format: 'vtt' });
+                fs.writeFileSync(subPath + movieId + "_" + "en.vtt", vtt);
+                subPathEn = fs.existsSync(subPath + movieId + "_" + "en.vtt")
+                    ? movieId + "_" + "en.vtt"
+                    : undefined;
+            }
+            return res.status(200).json(subPathEn);
+        });
+    } else {
+        return res.status(200).json(undefined);
+    }
 }
 
 async function addMovie(req, res, next) {
@@ -160,5 +208,7 @@ module.exports = {
     addMovie,
     deleteMovie,
     getMovies,
-    getSubtitles
+    getSubtitles,
+    clean,
+    subClean
 }
