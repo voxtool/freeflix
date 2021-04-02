@@ -2,13 +2,13 @@
 
 Freeflix is a free movie streaming application with responsive design and subtitle support. Powered by TMDB API.
 
-&ndash; Browse by genres
-&ndash; Search
-&ndash; Add movies to your collection to watch later
-&ndash; English subtitles
-&ndash; No leftover files
-&ndash; Top 20 trending movies each week
-&ndash; Choice between different releases
+&ndash; Browse by genres  
+&ndash; Search  
+&ndash; Add movies to your collection to watch later  
+&ndash; English subtitles  
+&ndash; No leftover files  
+&ndash; Top 20 trending movies each week  
+&ndash; Choice between different releases  
 
 ## What this app doesn't do?
 
