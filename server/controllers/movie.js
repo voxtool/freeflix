@@ -14,22 +14,21 @@ const OpenSubtitles = new OS({ useragent: 'UserAgent' });
 const streamDir = path.join(__dirname, '../../stream');
 const subtitleDir = path.join(__dirname, '../../src/subtitles/');
 let magnets = {};
+let imdbId = {};
 let ids = [];
-let imdbId = [];
-let torId;
 
 
 async function searchMovies(req, res, next) {
-    magnets = {};
     ids = [];
-    imdbId = [];
     const search = req.params.query;
     try {
         const searchResults = await TorrentSearchApi.search(search, 'Video', 5);
         searchResults.forEach(el => {
             magnets[el.id] = el.magnet;
             ids.push(el.id);
-            imdbId.push(el.imdb);
+            if (el.imdb !== '') {
+                imdbId[el.id] = el.imdb;
+            }
         });
         res.json(ids);
     } catch (error) {
@@ -69,7 +68,6 @@ async function playMovie(req, res, next) {
         }
     } else {
         client.add(magnets[id], { path: streamDir }, function (torrent) {
-            torId = magnets[id];
             const file = torrent.files.find(function (file) {
                 return file.name.endsWith('.mp4') ||
                     file.name.endsWith('.mkv') ||
@@ -102,8 +100,9 @@ async function playMovie(req, res, next) {
 }
 
 async function clean(req, res, next) {
-    if (client.get(torId)) {
-        client.remove(torId, (err) => { })
+    const id = req.params.id;
+    if (client.get(magnets[id])) {
+        client.remove(magnets[id], (err) => { })
     }
     rmdir(streamDir, function (error) {
         if (error) {
@@ -132,7 +131,8 @@ async function subClean(req, res, next) {
 }
 
 async function getSubtitles(req, res, next) {
-    const movieId = imdbId.find(el => el !== '');
+    const id = req.params.id;
+    const movieId = imdbId[id];
     if (movieId) {
         await OpenSubtitles.search({
             sublanguageid: "eng",
@@ -157,7 +157,7 @@ async function getSubtitles(req, res, next) {
                     : undefined;
             }
             return res.status(200).json(subPathEn);
-        });
+        }).catch(err => console.log(err));
     } else {
         return res.status(200).json(undefined);
     }

@@ -9,7 +9,7 @@ function Watch() {
     useEffect(() => {
         async function getSubtitles() {
             try {
-                const response = await fetch('/api/movies/subtitles', {
+                const response = await fetch(`/api/movies/subtitles/${id}`, {
                     headers: {
                         "Content-Type": "application/json",
                     },
@@ -20,12 +20,12 @@ function Watch() {
             } catch (error) { }
         }
         getSubtitles();
-    }, [subEn]);
+    }, [subEn, id]);
 
     useEffect(() => {
         return async () => {
             try {
-                const response = await fetch('/api/movies/clean', {
+                const response = await fetch(`/api/movies/clean/${id}`, {
                     headers: {
                         "Content-Type": "application/json",
                     },
@@ -34,7 +34,7 @@ function Watch() {
                 console.log(result);
             } catch (error) { }
         }
-    }, [])
+    }, [id])
 
     useEffect(() => {
         return async () => {
